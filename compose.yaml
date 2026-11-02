@@ -1,0 +1,22 @@
+services:
+  ajedrez:
+    build: .
+    environment:
+      VALKEY_URL: redis://valkey:6379/0
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      valkey:
+        condition: service_healthy
+  valkey:
+    image: valkey/valkey:8
+    command: ["valkey-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - partidas:/data
+volumes:
+  partidas:
